@@ -56,7 +56,7 @@ The following is a list of games with fixed camera angles that may also benefit 
 
 While working on this, I was also developing edge-scanner — the two projects evolved side by side, and [edge-scanner](https://github.com/Sparky101-2/edge-scanner) turned out to be an indispensable part of making this one possible.
 
-Appreciate you checking this out — if it helped, please drop a thanks in the comment section!
+Appreciate you checking this out — if it helped, [please drop a thanks here](https://saythanks.io/to/Sparky101-2)!
 
 ## Keywords (for search matching)
 
