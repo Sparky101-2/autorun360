@@ -1,0 +1,192 @@
+#pragma METAINFO("autorun360 for Diablo IV", 1, 0, "")
+#include <ps4.gph>
+#define RADIUS_X 99.0
+#define RADIUS_Y 98.0
+
+/*
+
+See: https://github.com/Sparky101-2/autorun360
+
+Feel free to change the Start/Stop triggers to whatever you prefer. 
+
+I have chosen my triggers (as defined below) for a Diablo IV Necromancer build 
+which doesn't need to have use of the right stick for targetting enemies. 
+
+Autorun 360 feature
+====================================
+TO START - R-stick   UP > 85 strength   and   L-stick >85 strength (in any direction)
+TO STOP  - R-stick DOWN > 85 strength
+
+*/
+
+// -------------------------------------------------------------------------------------------------------------
+// Current perimeter details - this data set (3 vars) will be updated by the sub: SetPerimeterStatsByAngle(...) 
+//                           note: (gf_cur_perimeter_x & gf_cur_perimeter_y) will be the perimeter (lx, ly) coords
+//                                 for the outer edge for the current L_angle (or gi_cur_perimeter_angle)
+uint8 gi_cur_perimeter_angle; // the current L_angle for autoRun360
+fix32 gf_cur_perimeter_x;     // the current perimeter lx value for current L_angle
+fix32 gf_cur_perimeter_y;     // the current perimeter lx value for current L_angle
+// -------------------------------------------------------------------------------------------------------------
+
+bool b_is_auto360_on = 0;
+
+fix32 lx, ly, rx, ry;
+uint8 L_stickStrength, R_stickStrength;
+int L_angle, R_angle;
+uint32 t_next_print = 0;
+
+init {
+}
+
+main {
+
+    Refresh_L_Stick_details();
+    Refresh_R_Stick_details();
+
+    if (!b_is_auto360_on) {
+        if (L_stickStrength >85 &&
+            R_stickStrength >85 &&
+            (R_angle > 320 || R_angle < 40)
+        ){
+            gf_cur_perimeter_x = 0.0;
+            gf_cur_perimeter_y = 0.0;
+            b_is_auto360_on = 1;
+            printf ("b_is_auto360_on = 1;");
+
+        }
+    }
+
+    else if (b_is_auto360_on) {
+        if (R_stickStrength >85 &&
+            (R_angle > 140 && R_angle < 240)
+        ){
+            b_is_auto360_on = 0;
+            printf ("b_is_auto360_on = 0;");
+        }
+    }
+
+
+    // if (event_active (PS4_L3)) {
+    //     gf_cur_perimeter_x = 0.0;
+    //     gf_cur_perimeter_y = 0.0;
+    //     b_is_auto360_on = 1;
+    // }
+    // else if (event_active (PS4_R3)) {
+    //     b_is_auto360_on = 0;
+    // }
+
+
+    if (b_is_auto360_on) {
+
+        // update Perimeter stats if stick not in the (big) deadzone
+        if (L_stickStrength > 85) SetPerimeterStatsByAngle (L_angle);
+
+        // output Perimeter stats for Left stick
+        set_val (STICK_2_X, gf_cur_perimeter_x);
+        set_val (STICK_2_Y, gf_cur_perimeter_y);
+    }
+
+    //Print_debug_data();
+
+}
+
+int getStickAngle360(fix32 x, fix32 y) {
+    // takes the (x,y) coords of the controller stick position, and outputs the angle
+    // this will ONLY return 0-359 (and not 360)
+    fix32 angle_rad = atan2(x, -y);
+    fix32 angle_deg = angle_rad * 57.2958;
+    if (angle_deg < 0.0) angle_deg += 360.0;
+    return ((int)(angle_deg + 0.5)) % 360;
+}
+
+uint8 getStickStrength(int stick_angle, fix32 x, fix32 y) {
+    // returns an integer in the range of zero to 100 indicating
+    //    how far the stick is from the centre (0) to the outer edge (100)
+
+    // Convert L_angle to radians
+    fix32 theta = (fix32)(stick_angle) * 0.017453292;  // deg to rad
+
+    // Elliptical radius at this L_angle
+    fix32 max_x = cos(theta) * RADIUS_X;
+    fix32 max_y = sin(theta) * RADIUS_Y;
+    fix32 max_length = sqrt(max_x * max_x + max_y * max_y);
+
+    // Current stick distance from center
+    fix32 magnitude = sqrt(x * x + y * y);
+
+    if (max_length <= 0.0) return 0;
+
+    fix32 percent = (magnitude / max_length) * 100.0;
+
+    if (percent < 0.0) return 0;
+    if (percent > 100.0) return 100;
+    return (uint8)percent;
+}
+
+void SetPerimeterStatsByAngle (int stick_angle) {
+/*  INPUT: stick_angle  -  the L_angle to calculate the perimeter (lx, ly) coords for (i.e. the outer edge (lx,ly) for this L_angle).
+                    this input could be of any degree of L_stickStrength. This sub should set the (lx, ly) outputs 
+                    which themselves should have a L_stickStrength of 100 (or very near it).
+    OUTPUTS: 
+        Will set the following global vars:
+        - gi_cur_perimeter_angle
+        - gf_cur_perimeter_x
+        - gf_cur_perimeter_y
+*/
+
+    // Convert L_angle to radians
+    fix32 theta = (fix32)(stick_angle % 360) * 0.017453292;
+
+    // Direction vector using same convention as getStickAngle360()
+    fix32 dir_x = sin(theta);
+    fix32 dir_y = -cos(theta);
+
+    // Project this direction onto the elliptical boundary
+    fix32 max_x = dir_x * RADIUS_X;
+    fix32 max_y = dir_y * RADIUS_Y;
+    fix32 max_length = sqrt(max_x * max_x + max_y * max_y);
+
+    // Scale to ellipse perimeter in this direction
+    gf_cur_perimeter_x = dir_x * max_length;
+    gf_cur_perimeter_y = dir_y * max_length;
+
+    // Store L_angle
+    gi_cur_perimeter_angle = stick_angle;
+}
+
+void Refresh_L_Stick_details(){
+    // get Left stick (lx, ly)
+    lx = get_val(STICK_2_X);
+    ly = get_val(STICK_2_Y);
+
+    L_angle = getStickAngle360 (lx, ly);
+    L_stickStrength = getStickStrength (L_angle, lx, ly);
+}
+
+void Refresh_R_Stick_details(){
+    // get Right stick (rx, ry)
+    rx = get_val(STICK_1_X);
+    ry = get_val(STICK_1_Y);
+
+    R_angle = getStickAngle360 (rx, ry);
+    R_stickStrength = getStickStrength (R_angle, rx, ry);
+}
+
+void Print_debug_data (){
+
+    if (system_time() >= t_next_print) {
+        printf ("====================================");
+        printf ("(lx, ly) = (%d, %d)", lx, ly);
+        printf ("L_angle = %d", L_angle);
+        printf ("L_stickStrength = %d", L_stickStrength);
+        printf ("   ------------   ");
+        printf ("(rx, ry) = (%d, %d)", rx, ry);
+        printf ("R_angle = %d", R_angle);
+        printf ("R_stickStrength = %d", R_stickStrength);
+        printf ("   ------------   ");
+        printf ("");
+        t_next_print = system_time() + 2000;
+    }
+
+
+}

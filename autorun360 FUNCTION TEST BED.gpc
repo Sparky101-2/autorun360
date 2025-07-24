@@ -1,0 +1,153 @@
+#pragma METAINFO("autorun360 FUNCTION TEST BED", 1, 0, "")
+#include <ps4.gph>
+#define RADIUS_X 99.0
+#define RADIUS_Y 98.0
+
+/*
+see: https://github.com/Sparky101-2/autorun360
+
+b_DEBUG... SWITCHES
+==================
+It is recommended to test with the following debug switches,
+in order, and running the tests separately.
+*/
+bool b_DEBUG_getStickStrength_AND_getStickAngle360 = 0;
+bool b_DEBUG_SetPerimeterStatsByAngle = 1;
+
+uint32 t_next_print = 0;
+uint32 t_next_print2 = 0;
+
+// -------------------------------------------------------------------------------------------------------------
+// Current perimeter details - this data set (3 vars) will be updated by the sub: SetPerimeterStatsByAngle(...) 
+//                           note: (gf_cur_perimeter_x & gf_cur_perimeter_y) will be the perimeter (x, y) coords
+//                                 for the outer edge for the current angle (or gi_cur_perimeter_angle)
+uint8 gi_cur_perimeter_angle; // the current angle for autoRun360
+fix32 gf_cur_perimeter_x;     // the current perimeter x value for current angle
+fix32 gf_cur_perimeter_y;     // the current perimeter x value for current angle
+// -------------------------------------------------------------------------------------------------------------
+
+init {
+}
+
+main {
+    fix32 x, y;
+    uint8 stickStrength;
+    int angle, new_angle;
+
+
+    // debugging SetPerimeterStatsByAngle
+    if (b_DEBUG_SetPerimeterStatsByAngle && 
+        system_time() >= t_next_print2) {
+        x = get_val(STICK_2_X);
+        y = get_val(STICK_2_Y);
+        
+        angle = getStickAngle360 (x, y);
+        stickStrength = getStickStrength (angle, x, y);
+
+        printf("==========================");
+        printf("INPUTS: ");
+        printf("x = %f", x);
+        printf("y = %f", y);
+        printf("angle (derived) = %d", angle);
+        printf("stickStrength (derived) = %d", stickStrength);
+        printf("");
+        printf("--------------------------");
+        SetPerimeterStatsByAngle (angle);
+        new_angle = getStickAngle360 (gf_cur_perimeter_x, gf_cur_perimeter_y);
+        printf("OUTPUTS (from SetPerimeterStatsByAngle(...) ): ");
+        //printf("gi_cur_perimeter_angle = %d", gi_cur_perimeter_angle);
+        printf("gf_cur_perimeter_x     = %f", gf_cur_perimeter_x);
+        printf("gf_cur_perimeter_y     = %f", gf_cur_perimeter_y);
+        printf("getStickStrength() on these outputs = %d", getStickStrength(gi_cur_perimeter_angle, gf_cur_perimeter_x, gf_cur_perimeter_y));
+        printf("angle of new coords = %d   [expected angle = %d]", new_angle, angle);
+        t_next_print2 = t_next_print2 + 3000; // print every 4 secs
+    }
+
+
+    // debugging getStickStrength
+    if (b_DEBUG_getStickStrength_AND_getStickAngle360 && 
+        system_time() >= t_next_print) {
+        x = get_val(STICK_2_X);
+        y = get_val(STICK_2_Y);
+        
+        angle = getStickAngle360 (x, y);
+        stickStrength = getStickStrength (angle, x, y);
+
+        printf("x = %f", x);
+        printf("y = %f", y);
+        printf("angle = %d", angle);
+        printf("stickStrength = %d", stickStrength);
+
+        t_next_print = t_next_print + 1000;
+    }
+}
+
+int getStickAngle360(fix32 x, fix32 y) {
+    // takes the (x,y) coords of the controller stick position, and outputs the angle
+    // this will ONLY return 0-359 (and not 360)
+    fix32 angle_rad = atan2(x, -y);
+    fix32 angle_deg = angle_rad * 57.2958;
+    if (angle_deg < 0.0) angle_deg += 360.0;
+    return ((int)(angle_deg + 0.5)) % 360;
+}
+
+
+uint8 getStickStrength(int stick_angle, fix32 x, fix32 y) {
+    // returns an integer in the range of zero to 100 indicating
+    //    how far the stick is from the centre (0) to the outer edge (100)
+
+
+    // Convert L_angle to radians
+    fix32 theta = (fix32)(stick_angle) * 0.017453292;  // deg to rad
+
+    // Elliptical radius at this L_angle
+    fix32 max_x = cos(theta) * RADIUS_X;
+    fix32 max_y = sin(theta) * RADIUS_Y;
+    fix32 max_length = sqrt(max_x * max_x + max_y * max_y);
+
+    // Current stick distance from center
+    fix32 magnitude = sqrt(x * x + y * y);
+
+    if (max_length <= 0.0) return 0;
+
+    fix32 percent = (magnitude / max_length) * 100.0;
+
+    if (percent < 0.0) return 0;
+    if (percent > 100.0) return 100;
+    return (uint8)percent;
+}
+
+void SetPerimeterStatsByAngle (int stick_angle) {
+/*  
+INPUT: stick_angle  -  the angle to calculate the perimeter (x, y) coords for (i.e. the outer edge (x,y) for this angle).
+                    this input could be of any degree of StickStrength. This sub should set the (x, y) outputs 
+                    which themselves should have a StickStrength of 100 (or very near it).
+OUTPUTS: 
+        Will set the following global vars:
+        - gi_cur_perimeter_angle
+        - gf_cur_perimeter_x
+        - gf_cur_perimeter_y
+
+TODO: implement & test, and then test function (test code already written above)
+
+*/
+
+    // Convert angle to radians
+    fix32 theta = (fix32)(stick_angle % 360) * 0.017453292;
+
+    // Direction vector using same convention as getStickAngle360()
+    fix32 dir_x = sin(theta);
+    fix32 dir_y = -cos(theta);
+
+    // Project this direction onto the elliptical boundary
+    fix32 max_x = dir_x * RADIUS_X;
+    fix32 max_y = dir_y * RADIUS_Y;
+    fix32 max_length = sqrt(max_x * max_x + max_y * max_y);
+
+    // Scale to ellipse perimeter in this direction
+    gf_cur_perimeter_x = dir_x * max_length;
+    gf_cur_perimeter_y = dir_y * max_length;
+
+    // Store angle
+    gi_cur_perimeter_angle = stick_angle;
+}
