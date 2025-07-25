@@ -4,7 +4,7 @@
 
 Ever wished autorun worked properly in games with locked camera angles? This [Titan 2](https://www.consoletuner.com/products/titan-two/) script makes that happen. It gives you 360° autorun in games like [Diablo IV](https://diablo4.blizzard.com) — where direction isn’t camera-relative, but fixed.
 
-Most autorun scripts just push the left stick up, which doesn’t cut it for fixed-view layouts. This one knows that running right means pushing the left stick right — and it handles movement accordingly.
+Most autorun scripts default to holding the stick forward, which doesn't work in games with a fixed camera. This one adjusts input direction dynamically — so if you’re moving right on-screen, the stick is pushed right accordingly.
 
 ## Trigger customisation
 
@@ -37,7 +37,7 @@ and
 ## List of other games with locked camera angles
 The following is a list of games with fixed camera angles that may also benefit from using this script.
 
-- Path of Exile
+- Path of Exile (PoE, PoE2)
 - Resident Evil (Remake & Zero)
 - Silent Hill 2 & 3
 - Baldur’s Gate III
@@ -56,7 +56,7 @@ The following is a list of games with fixed camera angles that may also benefit 
 
 While working on this, I was also developing edge-scanner — the two projects evolved side by side, and [edge-scanner](https://github.com/Sparky101-2/edge-scanner) turned out to be an indispensable part of making this one possible.
 
-Appreciate you checking this out — if it helped, [please drop a thanks here](https://saythanks.io/to/Sparky101-2)!
+Appreciate you checking this out — if it helped, [please drop a thanks here](https://www.reddit.com/r/TitanTwo/comments/1m8u5o8/360_autorun_is_finally_here_t2_script_for_diablo/)!
 
 ## Keywords (for search matching)
 
