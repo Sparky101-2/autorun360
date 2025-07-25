@@ -38,19 +38,21 @@ and
 The following is a list of games with fixed camera angles that may also benefit from using this script.
 
 - Path of Exile (PoE, PoE2)
-- Resident Evil (Remake & Zero)
-- Silent Hill 2 & 3
-- Baldur’s Gate III
-- Devil May Cry (original trilogy)
-- God of War (PS2 era)
-- Little Nightmares
-- Inside
-- Limbo
-- Crash Bandicoot (N. Sane Trilogy)
 - Torchlight III
-- Tormented Souls
-- Victor Vran
+- Pillars of Eternity II: Deadfire
+- Pathfinder: Wrath of the Righteous
 - Alienation
+- Victor Vran
+- Baldur’s Gate III
+- Little Nightmares
+- Limbo
+- Inside
+- Tormented Souls
+- Gauntlet: Slayer Edition​
+- Bastion
+- The Ascent
+- Pillars of the Earth
+- Disco Elysium – The Final Cut
 
 ## Final thoughts
 
