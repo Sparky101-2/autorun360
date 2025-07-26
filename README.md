@@ -6,6 +6,12 @@ Ever wished autorun worked properly in games with locked camera angles? This [Ti
 
 Most autorun scripts default to holding the stick forward, which doesn't work in games with a fixed camera. This one adjusts input direction dynamically — so if you’re moving right on-screen, the stick is pushed right accordingly.
 
+Using autorun360 feels intuitive:
+
+- Whilst autorun360 is on, you can change the direction by moving the left stick in any direction near to the outer  edge (i.e. with a stick strength > 85).
+
+- Autorun360 will continue in the direction that you last pointed the Left stick in.
+
 ## Trigger customisation
 
 The way I have implemented the triggers for enabling and disabling the autorun360 function is:
