@@ -1,4 +1,4 @@
-#pragma METAINFO("autorun360 for Diablo IV", 1, 0, "")
+#pragma METAINFO("autorun360 for Diablo IV", 1, 02, "")
 #include <ps4.gph>
 #define RADIUS_X 99.0
 #define RADIUS_Y 98.0
@@ -35,6 +35,10 @@ uint8 L_stickStrength, R_stickStrength;
 int L_angle, R_angle;
 uint32 t_next_print = 0;
 
+// min stick strengths required to trigger b_is_auto360_on
+uint8 L_stickStrength_MIN = 20; 
+uint8 R_stickStrength_MIN = 75; 
+
 init {
 }
 
@@ -43,9 +47,10 @@ main {
     Refresh_L_Stick_details();
     Refresh_R_Stick_details();
 
+    // detect if inputs are instructing to turn ON auto360
     if (!b_is_auto360_on) {
-        if (L_stickStrength >85 &&
-            R_stickStrength >85 &&
+        if (L_stickStrength > L_stickStrength_MIN &&
+            R_stickStrength > R_stickStrength_MIN &&
             (R_angle > 320 || R_angle < 40)
         ){
             gf_cur_perimeter_x = 0.0;
@@ -57,12 +62,22 @@ main {
     }
 
     else if (b_is_auto360_on) {
-        if (R_stickStrength >85 &&
+
+        // detect if inputs are instructing to turn OFF auto360
+        if (R_stickStrength > R_stickStrength_MIN &&
             (R_angle > 140 && R_angle < 240)
         ){
             b_is_auto360_on = 0;
             printf ("b_is_auto360_on = 0;");
         }
+
+        // update Perimeter stats if stick not in the (big) deadzone
+        if (L_stickStrength > L_stickStrength_MIN) SetPerimeterStatsByAngle (L_angle);
+        
+        // OUTPUT Perimeter stats for Left stick
+        set_val (STICK_2_X, gf_cur_perimeter_x);
+        set_val (STICK_2_Y, gf_cur_perimeter_y);
+        
     }
 
 
@@ -74,17 +89,6 @@ main {
     // else if (event_active (PS4_R3)) {
     //     b_is_auto360_on = 0;
     // }
-
-
-    if (b_is_auto360_on) {
-
-        // update Perimeter stats if stick not in the (big) deadzone
-        if (L_stickStrength > 85) SetPerimeterStatsByAngle (L_angle);
-
-        // output Perimeter stats for Left stick
-        set_val (STICK_2_X, gf_cur_perimeter_x);
-        set_val (STICK_2_Y, gf_cur_perimeter_y);
-    }
 
     //Print_debug_data();
 
