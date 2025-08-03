@@ -1,4 +1,4 @@
-#pragma METAINFO("autorun360 for Diablo IV", 1, 02, "")
+#pragma METAINFO("autorun360 for Diablo IV", 1, 03, "")
 #include <ps4.gph>
 #define RADIUS_X 99.0
 #define RADIUS_Y 98.0
@@ -36,7 +36,7 @@ int L_angle, R_angle;
 uint32 t_next_print = 0;
 
 // min stick strengths required to trigger b_is_auto360_on
-uint8 L_stickStrength_MIN = 20; 
+uint8 L_stickStrength_MIN = 50; 
 uint8 R_stickStrength_MIN = 75; 
 
 init {
