@@ -1,10 +1,10 @@
-# autorun360 - a Titan 2 script that provides a 360° autorun feature for fixed-view games like Diablo IV
+# autorun360 - a Titan 2 script that provides a 360° autorun feature for fixed-view (isometric) games like Diablo IV
 
 ## What is it
 
-Ever wished autorun worked properly in games with locked camera angles? This [Titan 2](https://www.consoletuner.com/products/titan-two/) script makes that happen. It gives you 360° autorun in games like [Diablo IV](https://diablo4.blizzard.com) — where direction isn’t camera-relative, but fixed.
+Ever wished autorun worked properly in games with locked camera angles? This [Titan 2](https://www.consoletuner.com/products/titan-two/) script makes that happen. It gives you 360° autorun in games like [Diablo IV](https://diablo4.blizzard.com) — where direction isn’t camera-relative, but fixed (aka isometric games).
 
-Most autorun scripts default to holding the stick forward, which doesn't work in games with a fixed camera. This one adjusts input direction dynamically — so if you’re moving right on-screen, the stick is pushed right accordingly.
+Most autorun scripts default to holding the stick forward, which doesn't work in isometric games. This one adjusts input direction dynamically — so if you’re moving right on-screen, the stick is pushed right accordingly.
 
 Using autorun360 feels intuitive:
 
@@ -41,7 +41,7 @@ and
 - returns an integer in the range of zero to 100 indicating how far the stick is from the centre (0) to the outer edge (100)
 
 ## List of other games with locked camera angles
-The following is a list of games with fixed camera angles that may also benefit from using this script.
+The following is a list of isometric games that may also benefit from using this script.
 
 - Path of Exile (PoE, PoE2)
 - Torchlight III
@@ -71,3 +71,4 @@ Appreciate you checking this out — if it helped, [please drop a thanks here](h
 titan-two, Titan 2, Titan2, Titan Two, TitanTwo, gpc, gtuner, script, console, psn, ps4, ps5, ps6, playstation, xbox
 
 auto run, autorun, 360, peripheral, periphery, outer edge, outer limit, scan, calibration, calibrated, calibrate
+
